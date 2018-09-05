@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "egress_all" {
 }
 
 data "template_file" "user-data" {
-  template = "${file("./modules/openvpn/userData.sh")}"
+  template = "${file("${path.module}/userData.sh")}"
   vars {
     admin_user  = "${var.admin_user}"
     admin_pw    = "${var.admin_password}"
