@@ -4,8 +4,7 @@ Terraform module for role out of an OpenVPN server
 ## Usage
 ```hcl-terraform
 module "backup" {
-  source            = "git@github.com:bluesentry/tf-module.openvpn.git"
-  version           = "v1.0.0"
+  source            = "git@github.com:bluesentry/tf-module.openvpn.git?ref=v1.0.1"
   vpc_id            = "${module.vpc.vpc_id}"
   vpc_cidr          = "${module.vpc.vpc_cidr_block}"
   public_subnet_ids = "${module.vpc.public_subnets}"
