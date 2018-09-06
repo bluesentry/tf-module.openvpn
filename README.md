@@ -38,8 +38,6 @@ The following module level arguments are supported.
 
 * instance_type - (Optional) The type of the instance.  Defaults to `t2.micro`.
 
-* split_tunnel - (true/false) A VPN is considered to be a split tunnel if it only routes private traffic over the tunnel and not the traffic destined for the default gateway.  Defaults to `true`
-
 * tags - (Optional) The tags assigned to all related resources that can be tagged.
 
 

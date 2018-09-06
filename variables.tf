@@ -31,11 +31,6 @@ variable "name" {
   default = "openvpn"
 }
 
-variable "split_tunnel" {
-  description = "Configure as a split tunnel or push internet traffic through vpn"
-  default     = "true"
-}
-
 variable "tags" {
   description = "The tags assigned to all related resources that can be tagged"
   type        = "map"
