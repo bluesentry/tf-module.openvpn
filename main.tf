@@ -62,15 +62,6 @@ resource "aws_security_group_rule" "egress_all" {
   security_group_id = "${aws_security_group.openvpn.id}"
 }
 
-data "template_file" "user-data" {
-  template = "${file("${path.module}/userData.sh")}"
-  vars {
-    admin_user  = "${var.admin_user}"
-    admin_pw    = "${var.admin_password}"
-    split_tunnel = "${var.split_tunnel}"
-  }
-}
-
 resource "aws_instance" "openvpn" {
   ami                    = "${data.aws_ami.openvpnas.id}"
   instance_type          = "${var.instance_type}"
@@ -85,8 +76,10 @@ resource "aws_instance" "openvpn" {
     ignore_changes = ["user_data", "ami"]
   }
 
-  user_data = "${data.template_file.user-data.rendered}"
-
+  user_data = <<USERDATA
+    admin_user=${var.admin_user}
+    admin_pw=${var.admin_password}
+  USERDATA
 }
 
 resource "aws_eip" "vpn" {
