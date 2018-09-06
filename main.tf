@@ -78,7 +78,7 @@ resource "aws_instance" "openvpn" {
 
   user_data = <<USERDATA
     admin_user=${var.admin_user}
-    admin_pw=${var.admin_password}
+    admin_pw=${data.aws_secretsmanager_secret_version.vpnadmin.secret_string}
   USERDATA
 }
 
@@ -113,8 +113,11 @@ resource "aws_secretsmanager_secret" "vpnadmin" {
 }
 resource "aws_secretsmanager_secret_version" "vpnadmin" {
   secret_id     = "${aws_secretsmanager_secret.vpnadmin.id}"
-  secret_string = "null"
+  secret_string = "var.admin_password"
   lifecycle {
     ignore_changes = ["secret_string"]
   }
+}
+data "aws_secretsmanager_secret_version" "vpnadmin" {
+  secret_id = "${aws_secretsmanager_secret.vpnadmin.id}"
 }
