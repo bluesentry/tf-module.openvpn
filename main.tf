@@ -52,6 +52,19 @@ resource "aws_security_group_rule" "ingress_udp1194" {
   security_group_id = "${aws_security_group.openvpn.id}"
 }
 
+data "external" "whatsmyip" {
+program = ["${path.module}/whatsmyip.sh"]
+}
+resource "aws_security_group_rule" "allow_ssh_from_my_ip" {
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = ["${data.external.whatsmyip.result["internet_ip"]}/32"]
+  security_group_id = "${aws_security_group.openvpn.id}"
+  description       = "BSI terraform automation access"
+}
+
 resource "aws_security_group_rule" "egress_all" {
   type        = "egress"
   protocol    = -1
