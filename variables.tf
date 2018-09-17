@@ -8,6 +8,10 @@ variable "admin_user" {}
 
 variable "admin_password" {}
 
+variable "dns_server_name" {
+  description = "(optional) DNS server name to be added to domain.  Default is vpn, which will result in similiar `vpn.example.com`"
+  default     = "vpn"
+}
 
 variable "hosted_zone" {
   description = "(optional) R53 hosted zone id, if provided an entry will be added for the openvpn server"
