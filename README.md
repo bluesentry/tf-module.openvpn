@@ -32,6 +32,8 @@ The following module level arguments are supported.
 
 * admin_name - (Optional) The admin user name.  Defaults to `vpnadmin`.
 
+* dns_server_name - (Optional) DNS server name to be added to domain.  Default is vpn. i.e. `vpn.example.com`"
+
 * name - (Optional) The name of the service.  Defaults to `OpenVPN`.
 
 * hosted_zone - (Optional) The Route 53 hosted zone id.  If provided, an entry will be added for vpn.{zone domain}.
