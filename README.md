@@ -18,35 +18,40 @@ module "backup" {
 }
 ```
 
+## SSL
+The OpenVPN server requires an ssl cert and does not currently support being put behind a load balancer.  Currently this module will generate an acme certificate via `Letsencrypt` and install it on the server.
+
 
 ## Argument Reference
 The following module level arguments are supported.
 
-* vpc_id - (Required) The id of the specific VPC that the OpenVPN server should be placed.
+* **vpc_id** - (Required) The id of the specific VPC that the OpenVPN server should be placed.
 
-* key_name - (Required) The keypair name to be associated with the OpenVPN EC2 instance.
+* **key_name** - (Required) The keypair name to be associated with the OpenVPN EC2 instance.
  
-* user_count - (Required) The desired # of concurrent users to license the server for.  Any of the following are supported: 2, 5,10, 25,50,100, 250
+* **user_count** - (Required) The desired # of concurrent users to license the server for.  Any of the following are supported: 2, 5,10, 25,50,100, 250
 
-* admin_password - (Required) The initial admin user password.  **NOTE**: This should only be used for the initial access to administration settings.  Password should then be promptly changed.
+* **admin_password** - (Required) The initial admin user password.  **NOTE**: This should only be used for the initial access to administration settings.  Password should then be promptly changed.
 
-* admin_name - (Optional) The admin user name.  Defaults to `vpnadmin`.
+* **admin_name** - (Optional) The admin user name.  Defaults to `vpnadmin`.
 
-* name - (Optional) The name of the service.  Defaults to `OpenVPN`.
+* **dns_server_name** - (Optional) DNS server name to be added to domain.  Default is vpn. i.e. `vpn.example.com`"
 
-* hosted_zone - (Optional) The Route 53 hosted zone id.  If provided, an entry will be added for vpn.{zone domain}.
+* **name** - (Optional) The name of the service.  Defaults to `OpenVPN`.
 
-* instance_type - (Optional) The type of the instance.  Defaults to `t2.micro`.
+* **hosted_zone** - (Optional) The Route 53 hosted zone id.  If provided, an entry will be added for vpn.{zone domain}.
 
-* tags - (Optional) The tags assigned to all related resources that can be tagged.
+* **instance_type** - (Optional) The type of the instance.  Defaults to `t2.micro`.
+
+* **tags** - (Optional) The tags assigned to all related resources that can be tagged.
 
 
 ## Attributes Reference
 The following attributes are exposed.
 
-* public_ip - The public IP address associated with the instance.
+* **public_ip** - The public IP address associated with the instance.
 
-* security_group - The security group for the instance
+* **security_group** - The security group for the instance
 
 
 ## Notes

@@ -82,6 +82,45 @@ resource "aws_instance" "openvpn" {
   USERDATA
 }
 
+resource "null_resource" "provision" {
+
+  triggers {
+    dns_id      = "${aws_route53_record.openvpn.id}"
+    instance_id = "${aws_instance.openvpn.id}"
+    cert        = "${acme_certificate.cert.certificate_pem}"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "openvpnas"
+    host        = "${aws_eip.vpn.public_ip}"
+    private_key = "${var.private_key}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+
+      # give openvpn time to come online
+      "sleep 30",
+
+      # add entry to host file, so sudo doesn't throw 'unable to resolve host'
+      "echo '${element(split(".", aws_instance.openvpn.private_dns), 0)}'",
+      "sudo sed -i 's/127.0.0.1 localhost/127.0.0.1 localhost ${element(split(".", aws_instance.openvpn.private_dns), 0)}/g' /etc/hosts",
+
+      # update hostname in config
+      "sudo /usr/local/openvpn_as/scripts/sacli --key host.name --value ${local.domain_name} ConfigPut",
+
+      # update with ssl cert
+      "sudo /usr/local/openvpn_as/scripts/sacli --key cs.priv_key --value '${tls_private_key.cert_key.private_key_pem}' ConfigPut",
+      "sudo /usr/local/openvpn_as/scripts/sacli --key cs.cert --value '${acme_certificate.cert.certificate_pem}' ConfigPut",
+      "sudo /usr/local/openvpn_as/scripts/sacli --key cs.ca_bundle --value '${acme_certificate.cert.issuer_pem}' ConfigPut",
+
+      # Do a warm retart
+      "sudo /usr/local/openvpn_as/scripts/sacli start"
+    ]
+  }
+}
+
 resource "aws_eip" "vpn" {
   vpc  = true
   tags = "${var.tags}"
@@ -96,10 +135,13 @@ resource "aws_eip_association" "eip_vpn" {
   allocation_id = "${aws_eip.vpn.id}"
 }
 
+data "aws_route53_zone" "subdomain" {
+  zone_id = "${var.hosted_zone}"
+}
 resource "aws_route53_record" "openvpn" {
   count   = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   zone_id = "${var.hosted_zone}"
-  name    = "vpn"
+  name    = "${var.dns_server_name}"
   type    = "A"
   ttl     = "300"
   records = ["${aws_eip.vpn.public_ip}"]
@@ -107,13 +149,13 @@ resource "aws_route53_record" "openvpn" {
 
 # Add secret for storing vpnadmin password
 resource "aws_secretsmanager_secret" "vpnadmin" {
-  name        = "vpnadmin_password"
+  name        = "vpnadmin_pass"
   description = "Password for openvpn admin user (vpnadmin)"
   tags        = "${var.tags}"
 }
 resource "aws_secretsmanager_secret_version" "vpnadmin" {
   secret_id     = "${aws_secretsmanager_secret.vpnadmin.id}"
-  secret_string = "var.admin_password"
+  secret_string = "${var.admin_password}"
   lifecycle {
     ignore_changes = ["secret_string"]
   }
