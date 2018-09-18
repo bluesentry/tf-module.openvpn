@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "ingress_udp1194" {
 }
 
 data "external" "whatsmyip" {
-program = ["${path.module}/whatsmyip.sh"]
+  program = ["bash", "-c", "echo '{\"internet_ip\":\"'$(dig +short myip.opendns.com @resolver1.opendns.com)'\"}'"]
 }
 resource "aws_security_group_rule" "allow_ssh_from_my_ip" {
   type              = "ingress"
