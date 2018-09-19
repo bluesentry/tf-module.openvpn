@@ -107,7 +107,7 @@ resource "null_resource" "provision" {
     type        = "ssh"
     user        = "openvpnas"
     host        = "${aws_eip.vpn.public_ip}"
-    private_key = "${var.private_key}"
+    private_key = "${var.ssh_private_key}"
   }
 
   provisioner "remote-exec" {

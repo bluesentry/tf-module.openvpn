@@ -35,6 +35,10 @@ variable "name" {
   default = "openvpn"
 }
 
+variable "ssh_private_key" {
+  description = "private key (pem) file contents"
+}
+
 variable "tags" {
   description = "The tags assigned to all related resources that can be tagged"
   type        = "map"
