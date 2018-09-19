@@ -29,6 +29,8 @@ The following module level arguments are supported.
 
 * **key_name** - (Required) The keypair name to be associated with the OpenVPN EC2 instance.
  
+* **ssh_private_key** - (Required) Private key used to ssh into server and configure.
+
 * **user_count** - (Required) The desired # of concurrent users to license the server for.  Any of the following are supported: 2, 5,10, 25,50,100, 250
 
 * **admin_password** - (Required) The initial admin user password.  **NOTE**: This should only be used for the initial access to administration settings.  Password should then be promptly changed.
