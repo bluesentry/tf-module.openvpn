@@ -3,7 +3,6 @@ variable "public_subnet_ids" {
   type = "list"
 }
 
-
 variable "admin_user" {}
 
 variable "admin_password" {}
@@ -61,10 +60,6 @@ variable "user_license" {
     "100" = "7091ef09-bad5-4f1d-9596-0ddf93d97793"
     "250" = "aac3a8a3-2823-483c-b5aa-60022894b89d"
   }
-}
-
-variable "vpc_cidr" {
-  description = "CIDR block that will have access to openvpn server"
 }
 
 variable "vpc_id" {

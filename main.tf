@@ -1,4 +1,3 @@
-
 data "aws_ami" "openvpnas" {
   most_recent = true
 
@@ -15,6 +14,10 @@ data "aws_ami" "openvpnas" {
   ]
 }
 
+data "aws_vpc" "main" {
+  id = "${var.vpc_id}"
+}
+
 resource "aws_security_group" "openvpn" {
   name        = "${var.name}"
   vpc_id      = "${var.vpc_id}"
@@ -27,7 +30,7 @@ resource "aws_security_group_rule" "ingress_vpcall" {
   protocol    = -1
   from_port   = 0
   to_port     = 0
-  cidr_blocks = ["${var.vpc_cidr}"]
+  cidr_blocks = ["${data.aws_vpc.main.cidr_block}"]
 
   security_group_id = "${aws_security_group.openvpn.id}"
 }
