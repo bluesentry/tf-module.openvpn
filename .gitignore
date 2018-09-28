@@ -9,3 +9,5 @@
 *.tfvars
 
 plan.out
+
+.idea/
