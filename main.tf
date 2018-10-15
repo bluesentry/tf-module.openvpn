@@ -165,7 +165,7 @@ resource "aws_route53_record" "openvpn" {
 
 # Add secret for storing vpnadmin password
 resource "aws_secretsmanager_secret" "vpnadmin" {
-  name        = "vpnadmin_pass"
+  name        = "${var.name}-vpnadmin"
   description = "Password for openvpn admin user (vpnadmin)"
   tags        = "${var.tags}"
 }
