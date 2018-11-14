@@ -4,7 +4,7 @@ Terraform module for role out of an OpenVPN server
 ## Usage
 ```hcl-terraform
 module "openvpn" {
-  source            = "git@github.com:bluesentry/tf-module.openvpn.git?ref=v1.0.1"
+  source            = "git@github.com:bluesentry/tf-module.openvpn.git?ref=v1.0.9"
   vpc_id            = "${module.vpc.vpc_id}"
   public_subnet_ids = "${module.vpc.public_subnets}"
   instance_profile  = "${module.backup.backup_role_name}"
@@ -20,7 +20,7 @@ module "openvpn" {
 
 ## SSL
 The OpenVPN server requires an ssl cert and does not currently support being put behind a load balancer.  Currently this module will generate an acme certificate via `Letsencrypt` and install it on the server.
-
+**Note:** The cert will only be created if hosted_zone is provided a value.  If left blank, the openvpn server will be created, but with no cert installed.
 
 ## Argument Reference
 The following module level arguments are supported.

@@ -7,34 +7,43 @@ provider "acme" {
 }
 
 resource "tls_private_key" "account_key" {
+  count     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   algorithm = "RSA"
 }
 
 resource "acme_registration" "reg" {
+  count           = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   account_key_pem = "${tls_private_key.account_key.private_key_pem}"
   email_address   = "support@bluesentryit.com"
 }
 
 
 resource "tls_private_key" "cert_key" {
+  count     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   algorithm = "RSA"
 }
 
-locals {
-  domain_name = "${var.dns_server_name}.${replace(data.aws_route53_zone.subdomain.name, "/[.]$/", "")}"
+resource "null_resource" "domain" {
+  count = "${length(var.hosted_zone) > 0 ? 1 : 0}"
+
+  triggers {
+    domain_name = "${var.dns_server_name}.${replace(data.aws_route53_zone.subdomain.name, "/[.]$/", "")}"
+  }
 }
 
 resource "tls_cert_request" "request" {
-  key_algorithm = "RSA"
+  count           = "${length(var.hosted_zone) > 0 ? 1 : 0}"
+  key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.cert_key.private_key_pem}"
-  dns_names = ["${local.domain_name}"]
+  dns_names       = ["${null_resource.domain.*.triggers.domain_name}"]
 
   subject {
-    common_name = "${local.domain_name}"
+    common_name = "${element(null_resource.domain.*.triggers.domain_name, 0)}"
   }
 }
 
 resource "acme_certificate" "cert" {
+  count                     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   account_key_pem           = "${acme_registration.reg.account_key_pem}"
   certificate_request_pem   = "${tls_cert_request.request.cert_request_pem}"
 
