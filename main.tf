@@ -100,6 +100,7 @@ resource "aws_instance" "openvpn" {
 }
 
 resource "null_resource" "provision" {
+  count   = "${length(var.hosted_zone) > 0 ? 1 : 0}"
 
   triggers {
     dns_id      = "${aws_route53_record.openvpn.id}"
@@ -125,7 +126,7 @@ resource "null_resource" "provision" {
       "sudo sed -i 's/127.0.0.1 localhost/127.0.0.1 localhost ${element(split(".", aws_instance.openvpn.private_dns), 0)}/g' /etc/hosts",
 
       # update hostname in config
-      "sudo /usr/local/openvpn_as/scripts/sacli --key host.name --value ${local.domain_name} ConfigPut",
+      "sudo /usr/local/openvpn_as/scripts/sacli --key host.name --value ${null_resource.domain.*.triggers.domain_name} ConfigPut",
 
       # update with ssl cert
       "sudo /usr/local/openvpn_as/scripts/sacli --key cs.priv_key --value '${tls_private_key.cert_key.private_key_pem}' ConfigPut",
@@ -153,6 +154,7 @@ resource "aws_eip_association" "eip_vpn" {
 }
 
 data "aws_route53_zone" "subdomain" {
+  count   = "${length(var.hosted_zone) > 0 ? 1 : 0}"
   zone_id = "${var.hosted_zone}"
 }
 resource "aws_route53_record" "openvpn" {
