@@ -49,9 +49,13 @@ The following module level arguments are supported.
 
 * **name** - (Optional) The name of the service.  Defaults to `OpenVPN`.
 
+* **secret_name** - (Optional) Provides ability to specify the secret name used to store the admin password in Secret Manager.
+
 * **hosted_zone** - (Optional) The Route 53 hosted zone id.  If provided, an entry will be added for vpn.{zone domain}.
 
 * **instance_type** - (Optional) The type of the instance.  Defaults to `t2.micro`.
+
+* **private_zones** - (Optional) If provided, DNS for these zones will be routed through VPN
 
 * **tags** - (Optional) The tags assigned to all related resources that can be tagged.
 
