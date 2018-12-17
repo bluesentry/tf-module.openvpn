@@ -34,6 +34,11 @@ variable "name" {
   default = "openvpn"
 }
 
+variable "secret_name" {
+  description = "Name of admin password secret that will be stored in Secret Manager"
+  default     = ""
+}
+
 variable "ssh_private_key" {
   description = "private key (pem) file contents"
 }
@@ -64,4 +69,9 @@ variable "user_license" {
 
 variable "vpc_id" {
   description = "VPC id where openvpn server will be placed"
+}
+
+variable "private_zones" {
+  description = "comma delimited list of private r53 zones, that dns should be routed thru vpn"
+  default     = ""
 }

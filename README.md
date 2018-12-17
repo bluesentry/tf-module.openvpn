@@ -18,6 +18,14 @@ module "openvpn" {
 }
 ```
 
+## Running Terraform
+If it is the first install on an account; you will likely see an error like this when running terraform.  Follow the link and subscribe to the AWS marketplace license, then re-run terraform.
+```
+* aws_instance.openvpn: Error launching source instance: OptInRequired: In order to use this AWS 
+Marketplace product you need to accept terms and subscribe. To do so 
+please visit https://aws.amazon.com/marketplace/pp?sku=blahblahsomething
+```
+
 ## SSL
 The OpenVPN server requires an ssl cert and does not currently support being put behind a load balancer.  Currently this module will generate an acme certificate via `Letsencrypt` and install it on the server.
 **Note:** The cert will only be created if hosted_zone is provided a value.  If left blank, the openvpn server will be created, but with no cert installed.
@@ -41,9 +49,13 @@ The following module level arguments are supported.
 
 * **name** - (Optional) The name of the service.  Defaults to `OpenVPN`.
 
+* **secret_name** - (Optional) Provides ability to specify the secret name used to store the admin password in Secret Manager.
+
 * **hosted_zone** - (Optional) The Route 53 hosted zone id.  If provided, an entry will be added for vpn.{zone domain}.
 
 * **instance_type** - (Optional) The type of the instance.  Defaults to `t2.micro`.
+
+* **private_zones** - (Optional) If provided, DNS for these zones will be routed through VPN
 
 * **tags** - (Optional) The tags assigned to all related resources that can be tagged.
 

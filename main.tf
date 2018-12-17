@@ -19,7 +19,7 @@ data "aws_vpc" "main" {
 }
 
 resource "aws_security_group" "openvpn" {
-  name        = "${var.name}"
+
   vpc_id      = "${var.vpc_id}"
   description = "OpenVPN security group"
   tags        = "${merge(var.tags, map("Name", "${var.name}-sg"))}"
@@ -139,6 +139,35 @@ resource "null_resource" "provision" {
   }
 }
 
+resource "null_resource" "zones" {
+  count = "${length(var.private_zones) > 0 ? 1 : 0}"
+
+  triggers {
+    zones = "${var.private_zones}"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "openvpnas"
+    host        = "${aws_eip.vpn.public_ip}"
+    private_key = "${var.ssh_private_key}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+
+      # private dns zone
+      "sudo /usr/local/openvpn_as/scripts/sacli --key vpn.server.dhcp_option.domain --value '${var.private_zones}' ConfigPut",
+      "sudo /usr/local/openvpn_as/scripts/sacli --key vpn.client.routing.reroute_dns --value 'true' ConfigPut",
+
+      # Do a warm retart
+      "sudo /usr/local/openvpn_as/scripts/sacli start"
+    ]
+  }
+
+  depends_on = ["null_resource.provision"]
+}
+
 resource "aws_eip" "vpn" {
   vpc  = true
   tags = "${var.tags}"
@@ -168,8 +197,8 @@ resource "aws_route53_record" "openvpn" {
 
 # Add secret for storing vpnadmin password
 resource "aws_secretsmanager_secret" "vpnadmin" {
-  name        = "${var.name}-vpnadmin"
-  description = "Password for openvpn admin user (vpnadmin)"
+  name        = "${length(var.secret_name) > 0 ? var.secret_name : "vpnadmin_pass"}"
+  description = "Password for openvpn admin user (${var.admin_user})"
   tags        = "${var.tags}"
 }
 resource "aws_secretsmanager_secret_version" "vpnadmin" {
