@@ -143,7 +143,8 @@ resource "null_resource" "zones" {
   count = "${length(var.private_zones) > 0 ? 1 : 0}"
 
   triggers {
-    zones = "${var.private_zones}"
+    zones       = "${var.private_zones}"
+    instance_id = "${aws_instance.openvpn.id}"
   }
 
   connection {
