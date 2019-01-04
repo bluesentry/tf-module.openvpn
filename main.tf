@@ -126,7 +126,7 @@ resource "null_resource" "provision" {
       "sudo sed -i 's/127.0.0.1 localhost/127.0.0.1 localhost ${element(split(".", aws_instance.openvpn.private_dns), 0)}/g' /etc/hosts",
 
       # update hostname in config
-      "sudo /usr/local/openvpn_as/scripts/sacli --key host.name --value ${null_resource.domain.*.triggers.domain_name} ConfigPut",
+      "sudo /usr/local/openvpn_as/scripts/sacli --key host.name --value ${element(null_resource.domain.*.triggers.domain_name, 0)} ConfigPut",
 
       # update with ssl cert
       "sudo /usr/local/openvpn_as/scripts/sacli --key cs.priv_key --value '${tls_private_key.cert_key.private_key_pem}' ConfigPut",
