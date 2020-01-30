@@ -45,7 +45,7 @@ The following module level arguments are supported.
 
 * **user_count** - (Required) The desired # of concurrent users to license the server for.  Any of the following are supported: 2, 5,10, 25,50,100, 250
 
-* **admin_password** - (Required) The initial admin user password.  **NOTE**: This should only be used for the initial access to administration settings.  Password should then be promptly changed.
+* **admin_password** - (Optional) The initial admin user password.  **NOTE**: Generally a bad idea.  Better to leave blank and let password be auto-generated.
 
 * **admin_password_secretkey** - (optional) If using an already existing secret, provide name here (if left blank a new secret will be generated)
 
