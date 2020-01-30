@@ -7,45 +7,36 @@ provider "acme" {
 }
 
 resource "tls_private_key" "account_key" {
-  count     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
+  count     = var.enable_acme_cert == true && length(var.external_dns) == 0 && length(var.hosted_zone) > 0 ? 1 : 0
   algorithm = "RSA"
 }
 
 resource "acme_registration" "reg" {
-  count           = "${length(var.hosted_zone) > 0 ? 1 : 0}"
-  account_key_pem = "${tls_private_key.account_key.private_key_pem}"
+  count           = var.enable_acme_cert == true && length(var.external_dns) == 0 && length(var.hosted_zone) > 0 ? 1 : 0
+  account_key_pem = tls_private_key.account_key.0.private_key_pem
   email_address   = "support@bluesentryit.com"
 }
 
-
 resource "tls_private_key" "cert_key" {
-  count     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
+  count     = var.enable_acme_cert == true && length(var.external_dns) == 0 && length(var.hosted_zone) > 0 ? 1 : 0
   algorithm = "RSA"
 }
 
-resource "null_resource" "domain" {
-  count = "${length(var.hosted_zone) > 0 ? 1 : 0}"
-
-  triggers {
-    domain_name = "${var.dns_server_name}.${replace(data.aws_route53_zone.subdomain.name, "/[.]$/", "")}"
-  }
-}
-
 resource "tls_cert_request" "request" {
-  count           = "${length(var.hosted_zone) > 0 ? 1 : 0}"
+  count           = var.enable_acme_cert == true && length(var.external_dns) == 0 && length(var.hosted_zone) > 0 ? 1 : 0
   key_algorithm   = "RSA"
-  private_key_pem = "${tls_private_key.cert_key.private_key_pem}"
-  dns_names       = ["${null_resource.domain.*.triggers.domain_name}"]
+  private_key_pem = tls_private_key.cert_key.0.private_key_pem
+  dns_names       = [join("", [var.dns_server_name, ".", replace(data.aws_route53_zone.subdomain.0.name, "/[.]$/", "")])]
 
   subject {
-    common_name = "${element(null_resource.domain.*.triggers.domain_name, 0)}"
+    common_name = join("", [var.dns_server_name, ".", replace(data.aws_route53_zone.subdomain.0.name, "/[.]$/", "")])
   }
 }
 
 resource "acme_certificate" "cert" {
-  count                     = "${length(var.hosted_zone) > 0 ? 1 : 0}"
-  account_key_pem           = "${acme_registration.reg.account_key_pem}"
-  certificate_request_pem   = "${tls_cert_request.request.cert_request_pem}"
+  count                     = var.enable_acme_cert == true && length(var.external_dns) == 0 && length(var.hosted_zone) > 0 ? 1 : 0
+  account_key_pem           = acme_registration.reg.0.account_key_pem
+  certificate_request_pem   = tls_cert_request.request.0.cert_request_pem
 
   dns_challenge {
     provider = "route53"
