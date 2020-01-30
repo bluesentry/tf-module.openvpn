@@ -1,15 +1,33 @@
 
-variable "public_subnet_ids" {
-  type = "list"
+variable "admin_user" {
+  description = "(optional) The admin user name.  Default is 'vpnadmin'"
+  default     = "vpnadmin"
 }
 
-variable "admin_user" {}
+variable "admin_password" {
+  description = "(optional and Not Recommmended!) password for Admin user (if left blank will use provided secret key or random generated)"
+  default     = ""
+}
 
-variable "admin_password" {}
+variable "admin_password_secretkey" {
+  description = "(optional) If using an already existing secret, provide name here (if left blank a new secret will be generated)"
+  default     = ""
+}
 
 variable "dns_server_name" {
-  description = "(optional) DNS server name to be added to domain.  Default is vpn, which will result in similiar `vpn.example.com`"
+  description = "(optional) DNS server name to be added to domain, if `hosted_zone` is provided.  Default is vpn, which will result in similiar `vpn.example.com`"
   default     = "vpn"
+}
+
+variable "enable_acme_cert" {
+  description = "(optional) If set to true, a free acme cert will be generated and configured.  Can NOT be used with `external_dns`"
+  type        = bool
+  default     = true
+}
+
+variable "external_dns" {
+  description = "(optional) Externally managed DNS can be provided.  Leaving blank will cause use of Route53 if hosted_zone provided"
+  default     = ""
 }
 
 variable "hosted_zone" {
@@ -34,8 +52,8 @@ variable "name" {
   default = "openvpn"
 }
 
-variable "secret_name" {
-  description = "Name of admin password secret that will be stored in Secret Manager"
+variable "private_zones" {
+  description = "comma delimited list of private r53 zones, that dns should be routed thru vpn"
   default     = ""
 }
 
@@ -43,9 +61,14 @@ variable "ssh_private_key" {
   description = "private key (pem) file contents"
 }
 
+variable "subnet_id" {
+  description = "subnet where openvpn instance will be placed"
+  type        = string
+}
+
 variable "tags" {
   description = "The tags assigned to all related resources that can be tagged"
-  type        = "map"
+  type        = map(string)
 }
 
 variable "user_count" {
@@ -53,7 +76,7 @@ variable "user_count" {
 }
 
 variable "user_license" {
-  type = "map"
+  type = map(string)
   description = "Maps to OpenVPN Access Server Product IDs"
 
   default = {
@@ -71,7 +94,3 @@ variable "vpc_id" {
   description = "VPC id where openvpn server will be placed"
 }
 
-variable "private_zones" {
-  description = "comma delimited list of private r53 zones, that dns should be routed thru vpn"
-  default     = ""
-}
