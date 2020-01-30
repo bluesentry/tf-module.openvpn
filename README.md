@@ -43,6 +43,8 @@ The following module level arguments are supported.
  
 * **ssh_private_key** - (Required) Private key used to ssh into server and configure.
 
+* **subnet_id** - (Required) Subnet where openvpn instance will be placed.
+
 * **user_count** - (Required) The desired # of concurrent users to license the server for.  Any of the following are supported: 2, 5,10, 25,50,100, 250
 
 * **admin_password** - (Optional) The initial admin user password.  **NOTE**: Generally a bad idea.  Better to leave blank and let password be auto-generated.
